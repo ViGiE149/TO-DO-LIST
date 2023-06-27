@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import TaskItem from './TaskItem';
 import TaskForm from './TaskForm';
-import {doc ,getFirestore, deleteDoc, query, where, collection, getDocs } from 'firebase/firestore/lite';
-
-import db from './firebase';
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
@@ -23,20 +20,9 @@ const TaskList = () => {
     setEditTask(task);
   };
 
-  const deleteTask = async (taskId) => {
-    try {
-         // Create a query to retrieve the document reference based on the condition
-         const q = query(collection(db, 'tasks'), where('id', '==', tasks.id));
-         const querySnapshot = await getDocs(q);
-         
-         querySnapshot.forEach(async (doc) => {
-           await deleteDoc(doc.ref);
-         });
-      const updatedTasks = tasks.filter((task) => task.id !== taskId);
-      setTasks(updatedTasks);
-    } catch (error) {
-      console.error('Error deleting task: ', error);
-    }
+  const deleteTask = (taskId) => {
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
   };
 
   return (

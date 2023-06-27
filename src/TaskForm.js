@@ -9,6 +9,7 @@ const TaskForm = ({ addTask, editTask }) => {
   const [id, setId] = useState('');
   const [title, setTitle] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [time, setTime] = useState('');
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
 
@@ -17,11 +18,13 @@ const TaskForm = ({ addTask, editTask }) => {
       setId(editTask.id);
       setTitle(editTask.title);
       setDueDate(editTask.dueDate);
+      setTime(editTask.time);
       setDescription(editTask.description);
     } else {
       setId(uuidv4());
       setTitle('');
       setDueDate('');
+      setTime('');
       setDescription('');
     }
   }, [editTask]);
@@ -39,7 +42,12 @@ const TaskForm = ({ addTask, editTask }) => {
       return;
     }
 
-    const task = { id, title, dueDate, description };
+    if (time === '') {
+      setError('Time must be selected');
+      return;
+    }
+
+    const task = { id, title, dueDate, time, description };
 
     try {
       const docRef = await addDoc(collection(db, 'tasks'), task);
@@ -47,6 +55,7 @@ const TaskForm = ({ addTask, editTask }) => {
       setId(uuidv4());
       setTitle('');
       setDueDate('');
+      setTime('');
       setDescription('');
       setError('');
     } catch (error) {
@@ -71,6 +80,11 @@ const TaskForm = ({ addTask, editTask }) => {
       if (speechToText.includes('due date')) {
         const extractedDate = speechToText.split('due date')[1].trim();
         setDueDate(extractedDate);
+      }
+
+      if (speechToText.includes('time')) {
+        const extractedTime = speechToText.split('time')[1].trim();
+        setTime(extractedTime);
       }
 
       if (speechToText.includes('description')) {
@@ -101,12 +115,20 @@ const TaskForm = ({ addTask, editTask }) => {
         onChange={(e) => setDescription(e.target.value)}
         className="todo-input"
       />
-      <input
-        type="date"
-        value={dueDate}
-        onChange={(e) => setDueDate(e.target.value)}
-        className="todo-input"
-      />
+      <div className="datetime-container">
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          className="todo-input"
+        />
+        <input
+          type="time"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          className="todo-input"
+        />
+      </div>
       <button type="submit" className="todo-button">
         {editTask ? 'Update Task' : 'Add Task'}
       </button>
